@@ -348,7 +348,20 @@ def _parse_response(text: str) -> Dict[str, Any]:
     return {"thinking_process": thinking, "action": action}
 
 
-try:  # Fire-and-forget warm-up so downloads start early
-    _ensure_pipeline_ready(_get_client())
-except Exception:  # pragma: no cover - best-effort warm-up
-    pass
+"""
+Optional import-time warm-up
+By default we avoid auto-warmup at import to prevent unexpected heavy
+initialization (which can crash constrained environments like Colab).
+Opt-in by setting environment variable QWEN_AUTOWARMUP to a truthy value
+('1', 'true', 'yes').
+"""
+import os as _os  # local alias to avoid polluting public namespace further
+
+_AUTO_WARMUP_FLAG = str(_os.getenv("QWEN_AUTOWARMUP", "0")).strip().lower()
+_AUTO_WARMUP_ENABLED = _AUTO_WARMUP_FLAG in {"1", "true", "yes", "on"}
+
+if _AUTO_WARMUP_ENABLED:
+    try:  # Fire-and-forget warm-up so downloads start early
+        _ensure_pipeline_ready(_get_client())
+    except Exception:  # pragma: no cover - best-effort warm-up
+        pass
