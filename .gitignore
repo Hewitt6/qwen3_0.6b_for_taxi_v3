@@ -126,3 +126,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# 创建一个 .gitignore 文件并添加 optimizer.pt
+echo "optimizer.pt" >> .gitignore
+
+# 将 .gitignore 文件添加到你的提交中
+git add .gitignore
